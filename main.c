@@ -1,11 +1,11 @@
 #include "commands.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct irongit_command{
   char *name;
-  int (*handler)(int argc, char *argv[]);
+  int (*handler)(int argc, char *argv[], char *flag);
+  char *flag;
 }irongit_command;
 
 irongit_command commands[] = {
@@ -26,7 +26,10 @@ int main(int argc, char **argv) {
   // Search for the command
   for (int i = 0; i < 2; i++) {
     if (strcmp(requested_command, commands[i].name) == 0) {
-      return commands[i].handler(argc, argv); // if it finds the command executes it
+        if(argc > 3){
+            return commands[i].handler(argc, argv, argv[2]);  // ex: irongit hash_object -w file.txt
+        }
+        return commands[i].handler(argc, argv, NULL); // if it finds the command executes it
     }
   }
   printf("irongit: '%s' is not an irongit command. See 'irongit --help'.\n", requested_command);

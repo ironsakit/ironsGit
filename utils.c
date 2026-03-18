@@ -200,12 +200,12 @@ char *create_new_string(char *type, unsigned long long int *size, FILE *file){
   return result;
 }
 
-void hash_object(char *nameFile, char **hashed_string){
+void hash_object(char *nameFile, char **hashed_string, unsigned long long int *final_size){
   if(file_exists(nameFile)){
     FILE *file = fopen(nameFile, "rb");
-    unsigned long long int size = get_file_size(file);
-    char *newString = create_new_string("blob", &size, file);
-    *hashed_string = SHA_1(newString, size);
+    *final_size = get_file_size(file);
+    char *newString = create_new_string("blob", final_size, file);
+    *hashed_string = SHA_1(newString, *final_size);
     free(newString);
   }
 }
