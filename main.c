@@ -1,11 +1,10 @@
-#include "commands.h"
+#include "utils/commands.h"
 #include <stdio.h>
 #include <string.h>
 
 typedef struct irongit_command{
   char *name;
   int (*handler)(int argc, char *argv[], char *flag);
-  char *flag;
 }irongit_command;
 
 irongit_command commands[] = {

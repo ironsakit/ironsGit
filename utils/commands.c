@@ -13,20 +13,21 @@ int cmd_hash_object(int argc, char *argv[], char *flag){
   }
   char *hash_value = NULL;
   char *file_name = argv[2];
+  if(flag != NULL){
+    file_name = argv[3];
+  }
+  
   if (file_exists(file_name)) {
     unsigned long long int size = 0;
     hash_object(file_name, &hash_value, &size);
     printf("%s\n", hash_value); // Final hash
     if(flag != NULL){
-        unsigned long int compressed_len = compressBound(size);
-        unsigned char *compressed_data = (unsigned char*) malloc(compressed_len);
-        int result = compress(compressed_data, &compressed_len, (unsigned char*)hash_value, size);
-        if(result){
-            fprintf(stderr, "Error compressing data.");
-            free(compressed_data);
-            return COMMAND_NOT_OK;
-        }
-        char file_path[512];
+      char path[256] = ".irongit/objects/";
+      strncat(path, hash_value, 2);
+      create_dir(path);
+      strcat(path, "/");
+      strncat(path, hash_value + 2, 38);
+      compress_and_save((unsigned char*)hash_value, size, path);
     }
     free(hash_value); 
   } else {

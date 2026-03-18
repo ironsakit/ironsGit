@@ -1,10 +1,2 @@
-CC = gcc
-CFLAGS = -Wall
-
-SRC = $(wildcard *.c)
-
-irongit.exe:
-	$(CC) $(CFLAGS) $(SRC) -o irongit.exe
-
-clean:
-	del irongit.exe
+irongit.exe: index.c main.c objects.c utils/*.c
+	gcc -Wall index.c main.c objects.c utils/*.c -o irongit.exe -lz

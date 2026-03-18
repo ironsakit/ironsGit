@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define THROW_UP 1
-#define GOOD_BOY 0
 #define CONTINUE 1
 #define STOP 0
 #define DIM_BLOCK 64  // 64 byte = 512 bit
@@ -13,9 +11,6 @@
 #define DIM_WORDS_CREATED 80
 #define SHA_1_LEN 41
 #define LEFT_ROTATE(value, bits) (((unsigned int)(value) <<(bits)) | ((unsigned int)(value) >> (32 - (bits))))  // Fast macro implementation (cool idea) to manipulate the left circular ratation
-
-#define SIZE_MINIMA_STRINGA 5
-#define OFFSET_STRINGA 10
 
 /* Sha_struct i will use to make easier my SHA implementation */
 typedef struct Sha_struct Sha_struct;
@@ -95,7 +90,7 @@ void create_80_words_from_16_words(unsigned int **words_16){
   }else{
     fprintf(stderr, "ERROR: REALLOC FAILD.\n");
     free(*words_16);
-    exit(THROW_UP);
+    exit(1);
   }
   unsigned int X = 0;
   for(int i = 16; i < DIM_WORDS_CREATED; i++) {
@@ -161,89 +156,4 @@ char * SHA_1(char *string, unsigned long long int total_len){
   sprintf(SHA_1_string, "%08x%08x%08x%08x%08x", myBuffer.sha_state[0], myBuffer.sha_state[1], myBuffer.sha_state[2], myBuffer.sha_state[3], myBuffer.sha_state[4]);
   
   return SHA_1_string;
-}
-
-int file_exists(char *path){
-  FILE *ptr = fopen(path, "r");
-  if(ptr != NULL){
-    fclose(ptr);
-    return 1;
-  }else{
-    return 0;
-  }
-}
-
-unsigned long long int get_file_size(FILE *file){
-  if(fseek(file, 0, SEEK_END) != 0) return 0;  // error
-  long len = ftell(file);
-  if(len == -1L) return 0;  // error
-  rewind(file);
-  return (unsigned long long int)len;
-}
-
-
-char *create_new_string(char *type, unsigned long long int *size, FILE *file){
-  char buffer[256];
-  int len_header = sprintf(buffer, "%s %llu", type, *size);
-  
-  char *result = calloc(len_header + *size + 1, sizeof(char));
-  if(!result) return NULL;
-
-  memcpy(result, buffer, len_header);
-
-  result[len_header] = '\0';
-  rewind(file);
-  fread(result + len_header + 1, 1, *size, file);
-
-  fclose(file);
-  *size += len_header + 1;
-  return result;
-}
-
-void hash_object(char *nameFile, char **hashed_string, unsigned long long int *final_size){
-  if(file_exists(nameFile)){
-    FILE *file = fopen(nameFile, "rb");
-    *final_size = get_file_size(file);
-    char *newString = create_new_string("blob", final_size, file);
-    *hashed_string = SHA_1(newString, *final_size);
-    free(newString);
-  }
-}
-
-char *alloca_Stringa(size_t size){
-  return (char *) calloc(size, sizeof(char));
-}
-
-int rialloca_stringa(char **s, size_t size_nuova){
-  char *tmp = (char *)realloc(*s, sizeof(char) * size_nuova);  // Rialloco la stringa s con una nuova dimensione
-  if(tmp != NULL){  // Se l'operazione e' andata a buon fine realloc resituisce il puntatore alla nuova stringa
-    *s = tmp;  // Quindi possiamo tranquillamente puntare a quello locazione di memoria
-    return 1;
-  }
-  return 0;
-}
-
-char* scrivi(){
-  int c;
-  size_t i = 0, len = SIZE_MINIMA_STRINGA;
-  char *s = alloca_Stringa(len);  // Alloco spazio minimo per la stringa
-
-  if(s == NULL){  // Controllo se la malloc e' andata a buon fine
-    fprintf(stderr, "Error: function scrivi() does not work.\n");
-    exit(1);
-  }
-
-  while((c = getchar()) != '\n' && c != EOF){
-    if(i >= len - 1){
-      len += OFFSET_STRINGA;
-      if(!rialloca_stringa(&s, len)){  // Rialloco una nuova dimensione (+10 caratteri) per la stringa
-	fprintf(stderr, "Error: function scrivi() does not work.\n");
-	exit(1);
-      }
-    }
-    s[i] = (char)c;
-    i++;
-  }
-  s[i] = '\0';  // Chiudiamo la stringa
-  return s;
 }
