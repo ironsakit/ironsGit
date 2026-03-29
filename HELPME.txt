@@ -1,0 +1,3 @@
+If windows 11 does not want to execute irongit.exe try to deactivate "Intelligent App Control" or in "Windows Security" --> "virus & threat protection" --> "Manage settings" --> "Add exclusions" and add the folder "ironsGit".
+
+Thank you!
